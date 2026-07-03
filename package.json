@@ -8,12 +8,13 @@
                     "start":  "node server.js",
                     "build":  "vite build",
                     "preview":  "vite preview",
-                    "test":  "node test/status.test.mjs \u0026\u0026 node test/qr.test.mjs \u0026\u0026 node test/mockAuth.test.mjs \u0026\u0026 node test/viteConfig.test.mjs \u0026\u0026 node test/reactImports.test.mjs \u0026\u0026 node test/camera.test.mjs \u0026\u0026 node test/runtime.test.mjs",
+                    "test":  "node test/status.test.mjs \u0026\u0026 node test/qr.test.mjs \u0026\u0026 node test/mockAuth.test.mjs \u0026\u0026 node test/viteConfig.test.mjs \u0026\u0026 node test/reactImports.test.mjs \u0026\u0026 node test/camera.test.mjs \u0026\u0026 node test/runtime.test.mjs \u0026\u0026 node test/authGateway.test.mjs \u0026\u0026 node test/httpClient.test.mjs",
                     "dev:https":  "node server.js --https"
                 },
     "dependencies":  {
                          "@zxing/browser":  "^0.2.0",
                          "express":  "^4.21.2",
+                         "qrcode":  "^1.5.4",
                          "react":  "^19.0.0",
                          "react-dom":  "^19.0.0",
                          "selfsigned":  "^5.5.0"

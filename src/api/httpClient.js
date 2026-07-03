@@ -7,8 +7,7 @@ export function getApiBase() {
 }
 
 export function shouldUseMock() {
-  if (import.meta.env.PROD) return import.meta.env.VITE_USE_MOCK === 'true';
-  return import.meta.env.VITE_USE_MOCK !== 'false';
+  return import.meta.env.VITE_USE_MOCK === 'true';
 }
 
 export function buildMobileApiUrl(path, query = {}) {
@@ -65,3 +64,4 @@ export async function requestJson(path, options = {}) {
 
   return payload;
 }
+
