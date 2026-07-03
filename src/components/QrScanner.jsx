@@ -1,25 +1,35 @@
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { getCameraUnavailableMessage } from '../utils/camera.js';
 import { AUTH_ERROR_MESSAGES } from '../utils/errors.js';
 
 export function QrScanner({ active, onScan, onError }) {
   const videoRef = useRef(null);
   const controlsRef = useRef(null);
   const [scannerState, setScannerState] = useState('idle');
+  const [statusMessage, setStatusMessage] = useState('准备扫码');
 
   useEffect(() => {
     let cancelled = false;
 
     async function startScanner() {
       if (!active) return;
-      if (!navigator.mediaDevices?.getUserMedia) {
+
+      const unavailableMessage = getCameraUnavailableMessage({
+        isSecureContext: window.isSecureContext,
+        mediaDevices: navigator.mediaDevices
+      });
+
+      if (unavailableMessage) {
         setScannerState('unsupported');
-        onError?.(new Error(AUTH_ERROR_MESSAGES.CAMERA_UNSUPPORTED));
+        setStatusMessage(unavailableMessage);
+        onError?.(new Error(unavailableMessage));
         return;
       }
 
       setScannerState('starting');
+      setStatusMessage('正在打开摄像头...');
       try {
         const { BrowserQRCodeReader } = await import('@zxing/browser');
         if (cancelled || !videoRef.current) return;
@@ -30,6 +40,7 @@ export function QrScanner({ active, onScan, onError }) {
             callbackControls.stop();
             controlsRef.current = null;
             setScannerState('decoded');
+            setStatusMessage('已识别二维码');
             onScan(result.getText());
           }
         });
@@ -41,11 +52,13 @@ export function QrScanner({ active, onScan, onError }) {
 
         controlsRef.current = controls;
         setScannerState('scanning');
+        setStatusMessage('请将二维码放入框内');
       } catch (error) {
         const message = error?.name === 'NotAllowedError'
           ? AUTH_ERROR_MESSAGES.CAMERA_DENIED
           : AUTH_ERROR_MESSAGES.CAMERA_UNSUPPORTED;
         setScannerState('error');
+        setStatusMessage(message);
         onError?.(new Error(message));
       }
     }
@@ -65,14 +78,7 @@ export function QrScanner({ active, onScan, onError }) {
     <div className="qr-scanner">
       <video ref={videoRef} className="qr-video" muted playsInline aria-label="二维码摄像头预览" />
       <div className="qr-frame" aria-hidden="true" />
-      <p className="qr-status">
-        {scannerState === 'starting' ? '正在打开摄像头...' : null}
-        {scannerState === 'scanning' ? '请将二维码放入框内' : null}
-        {scannerState === 'decoded' ? '已识别二维码' : null}
-        {scannerState === 'unsupported' ? '当前浏览器不支持扫码' : null}
-        {scannerState === 'error' ? '无法打开摄像头' : null}
-        {scannerState === 'idle' ? '准备扫码' : null}
-      </p>
+      <p className={`qr-status qr-status-${scannerState}`}>{statusMessage}</p>
     </div>
   );
 }
