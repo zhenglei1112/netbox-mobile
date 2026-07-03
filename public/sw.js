@@ -1,5 +1,5 @@
-const CACHE_NAME = 'netbox-mobile-shell-v1';
-const SHELL_ASSETS = ['/', '/m/rooms', '/manifest.webmanifest', '/pwa-icon.svg'];
+const CACHE_NAME = 'infraops-mobile-shell-v2';
+const SHELL_ASSETS = ['/', '/mobile/', '/mobile/login', '/manifest.webmanifest', '/pwa-icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS)));
@@ -18,13 +18,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/mobile-api/')) {
     return;
   }
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/m/rooms').then((cached) => cached || caches.match('/')))
+      fetch(event.request).catch(() => caches.match('/mobile/').then((cached) => cached || caches.match('/')))
     );
     return;
   }

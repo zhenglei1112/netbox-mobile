@@ -1,25 +1,21 @@
-# NetBox Mobile Scaffold Design
+# NetBox Mobile Scan Auth Design
 
 ## Scope
 
-Build a runnable PWA scaffold for a NetBox mobile companion. This iteration does not implement real NetBox business flows, authentication, querying, confirmation, or mutation.
+This phase implements only the PWA scan authentication flow. It does not include device search, site search, inspection, incident registration, IP lookup, push notifications, or NetBox plugin work.
 
 ## Architecture
 
-The project uses a single Node/Express service. In development, Express loads Vite middleware; in production, it serves the Vite `dist/` output. The browser only talks to local `/api/...` routes so future NetBox tokens and permission rules stay in the BFF.
+The React PWA renders `/mobile/...` authentication routes and talks only to `/mobile-api/...` through `authService`. The browser never stores NetBox passwords, usernames, API tokens, or fixed administrator credentials. Real security validation remains a backend responsibility; the first round includes a development Mock mode for UI and flow verification.
 
-## Frontend
+## Frontend Flow
 
-React renders a mobile-first application under `/m/...`. The first scaffold includes page shells for rooms, contracts, incidents, changes, and profile/status. Shared mobile components provide the header, bottom navigation, search field, and status badge.
+`/mobile/` checks the session. Logged-out users go to `/mobile/login`; logged-in users go to `/mobile/home`; 403 responses go to `/mobile/forbidden`. The login page scans a short-lived pairing QR code, validates the basic JSON shape, submits it through `authService.pair`, then refreshes session state.
 
-## Backend
+## QR Payload
 
-The backend exposes `/api/health` and `/api/netbox/status` as scaffold endpoints. `server/netboxClient.js` is the future integration boundary for NetBox REST or GraphQL calls.
+The QR code contains only one-time pairing metadata: `type`, `pairing_id`, `nonce`, and `expires_at`. The frontend rejects invalid shape and expired timestamps, but final replay, permission, device, and expiry checks belong on the backend.
 
-## PWA
+## Mock Mode
 
-The scaffold includes a manifest, service worker, and mobile meta tags. The service worker caches only the shell assets and avoids caching API responses.
-
-## Verification
-
-The scaffold is verified with Node native tests for API helper behavior and server status shape, then `npm run build` for the Vite production bundle.
+Development defaults to Mock mode unless `VITE_USE_MOCK=false`. Production uses Mock only when explicitly built with `VITE_USE_MOCK=true`; Mock must not be enabled in a real deployment.
