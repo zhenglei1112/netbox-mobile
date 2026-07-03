@@ -1,3 +1,4 @@
+import React from 'react';
 import { AppLayout } from '../components/AppLayout.jsx';
 import { EmptyState } from '../components/EmptyState.jsx';
 

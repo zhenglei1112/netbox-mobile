@@ -1,3 +1,4 @@
+import React from 'react';
 export function AppLayout({ title, subtitle, children, footer }) {
   return (
     <main className="auth-shell">

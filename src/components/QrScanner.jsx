@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { AUTH_ERROR_MESSAGES } from '../utils/errors.js';

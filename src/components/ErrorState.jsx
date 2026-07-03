@@ -1,3 +1,4 @@
+import React from 'react';
 export function ErrorState({ title = '操作失败', message, action }) {
   return (
     <div className="state-block state-error" role="alert">

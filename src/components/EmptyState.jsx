@@ -1,3 +1,4 @@
+import React from 'react';
 export function EmptyState({ title, message }) {
   return (
     <div className="state-block">
