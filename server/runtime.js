@@ -9,3 +9,12 @@ export function getServerRuntimeConfig({ env = process.env, argv = process.argv.
     protocol: httpsEnabled ? 'https' : 'http'
   };
 }
+
+export function getViteServerOptions({ httpsEnabled, port, hmrServer }) {
+  return {
+    middlewareMode: true,
+    hmr: httpsEnabled
+      ? { server: hmrServer, protocol: 'wss', clientPort: port }
+      : { protocol: 'ws', port: port + 1 }
+  };
+}

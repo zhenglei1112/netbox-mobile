@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 
 import { createMobileAuthGateway } from './server/authGateway.js';
 import { ensureDevHttpsOptions } from './server/devHttps.js';
-import { getServerRuntimeConfig } from './server/runtime.js';
+import { getServerRuntimeConfig, getViteServerOptions } from './server/runtime.js';
 import { createHealthPayload } from './server/status.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,6 +16,9 @@ const { port, httpsEnabled, protocol } = getServerRuntimeConfig();
 const isProduction = process.env.NODE_ENV === 'production';
 const gateway = createMobileAuthGateway();
 const sessionCookieName = '__Host-netbox_mobile_session';
+const server = httpsEnabled
+  ? https.createServer(await ensureDevHttpsOptions(), app)
+  : http.createServer(app);
 
 app.use(express.json());
 
@@ -138,19 +141,13 @@ if (isProduction) {
 } else {
   const { createServer } = await import('vite');
   const vite = await createServer({
-    server: {
-      middlewareMode: true,
-      hmr: { protocol: httpsEnabled ? 'wss' : 'ws', port: port + 1 }
-    },
+    server: getViteServerOptions({ httpsEnabled, port, hmrServer: server }),
     appType: 'spa'
   });
 
   app.use(vite.middlewares);
 }
 
-const server = httpsEnabled
-  ? https.createServer(await ensureDevHttpsOptions(), app)
-  : http.createServer(app);
 
 server.listen(port, '0.0.0.0', () => {
   const localUrl = `${protocol}://localhost:${port}/mobile/`;

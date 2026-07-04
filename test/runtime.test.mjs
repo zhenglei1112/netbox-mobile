@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getServerRuntimeConfig } from '../server/runtime.js';
+import { getServerRuntimeConfig, getViteServerOptions } from '../server/runtime.js';
 
 test('getServerRuntimeConfig uses HTTP port 8088 by default', () => {
   assert.deepEqual(getServerRuntimeConfig({ env: {}, argv: [] }), {
@@ -24,5 +24,18 @@ test('getServerRuntimeConfig lets PORT override the HTTPS default port', () => {
     port: 9443,
     httpsEnabled: true,
     protocol: 'https'
+  });
+});
+
+test('getViteServerOptions keeps HTTPS HMR on the same mobile test port', () => {
+  const hmrServer = { on() {} };
+
+  assert.deepEqual(getViteServerOptions({ httpsEnabled: true, port: 8443, hmrServer }), {
+    middlewareMode: true,
+    hmr: {
+      server: hmrServer,
+      protocol: 'wss',
+      clientPort: 8443
+    }
   });
 });
